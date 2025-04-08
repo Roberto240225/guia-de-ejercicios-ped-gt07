@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+
+class Paciente : IComparable<Paciente>
+{
+    public string Nombre { get; set; }
+    public int Prioridad { get; set; }
+
+    public Paciente(string nombre, int prioridad)
+    {
+        Nombre = nombre;
+        Prioridad = prioridad;
+    }
+
+    public int CompareTo(Paciente otro)
+    {
+       
+        return this.Prioridad.CompareTo(otro.Prioridad);
+    }
+}
+
+class Programa
+{
+    static void Main()
+    {
+        var colaPrioridad = new SortedSet<Paciente>(Comparer<Paciente>.Create((a, b) =>
+        {
+            int cmp = a.Prioridad.CompareTo(b.Prioridad);
+            if (cmp == 0)
+                return a.Nombre.CompareTo(b.Nombre); 
+            return cmp;
+        }));
+
+        colaPrioridad.Add(new Paciente("Ana", 3));
+        colaPrioridad.Add(new Paciente("Luis", 1));
+        colaPrioridad.Add(new Paciente("Sofía", 2));
+        colaPrioridad.Add(new Paciente("Marta", 1));
+        colaPrioridad.Add(new Paciente("Pedro", 2));
+
+        Console.WriteLine("Orden de atención de pacientes:");
+
+        foreach (var paciente in colaPrioridad)
+        {
+            Console.WriteLine($"{paciente.Nombre} (Prioridad {paciente.Prioridad})");
+        }
+    }
+}
+
+
