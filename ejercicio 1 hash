@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+namespace eje_hash
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            // Inicializar la tabla hash con 7 cubetas
+            List<string>[] hashTable = new List<string>[7];
+            for (int i = 0; i < 7; i++)
+            {
+                hashTable[i] = new List<string>();
+            }
+
+            string[] codigos = { "MZ123", "QK456", "PL789", "MN321", "QK654", "PL987", "MZ321" };
+
+            // Insertar cada código en la tabla hash
+            foreach (string codigo in codigos)
+            {
+                int indiceHash = CalcularHash(codigo);
+                hashTable[indiceHash].Add(codigo);
+            }
+
+            // Mostrar la tabla hash resultante
+            for (int i = 0; i < hashTable.Length; i++)
+            {
+                Console.Write($"Cubeta {i}: ");
+                foreach (string codigo in hashTable[i])
+                {
+                    Console.Write($"{codigo} -> "); // Usamos "->" en lugar de "→" para evitar problemas
+                }
+                Console.WriteLine("null");
+            }
+        }
+
+        static int CalcularHash(string codigo)
+        {
+            int sumaAscii = 0;
+            foreach (char caracter in codigo)
+            {
+                sumaAscii += (int)caracter;
+            }
+            return sumaAscii % 7;
+            }
+    }
+}
