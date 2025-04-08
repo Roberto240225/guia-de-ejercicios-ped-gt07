@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+
+namespace grafos
+{
+    internal class Program
+    {
+        class Grafo
+        {
+            private Dictionary<string, List<(string destino, int peso)>> adyacencias;
+
+            public Grafo()
+            {
+                adyacencias = new Dictionary<string, List<(string, int)>>();
+            }
+
+            public void Arista(string desde, string hacia, int peso)
+            {
+                if (!adyacencias.ContainsKey(desde))
+                    adyacencias[desde] = new List<(string, int)>();
+
+                if (!adyacencias.ContainsKey(hacia))
+                    adyacencias[hacia] = new List<(string, int)>();
+
+                adyacencias[desde].Add((hacia, peso));
+                adyacencias[hacia].Add((desde, peso));
+            }
+
+            public void Dijkstra(string inicio, string fin)
+            {
+                var distancias = new Dictionary<string, int>();
+                var anteriores = new Dictionary<string, string>();
+                var visitados = new HashSet<string>();
+                var colaPrioridad = new SortedSet<(int distancia, string nodo)>();
+
+                foreach (var ciudad in adyacencias.Keys)
+                {
+                    distancias[ciudad] = int.MaxValue;
+                    anteriores[ciudad] = null;
+                }
+
+                distancias[inicio] = 0;
+                colaPrioridad.Add((0, inicio));
+
+                while (colaPrioridad.Count > 0)
+                {
+                    var actual = ObtenerMinimo(colaPrioridad);
+                    var nodoActual = actual.nodo;
+
+                    if (visitados.Contains(nodoActual))
+                        continue;
+
+                    visitados.Add(nodoActual);
+
+                    foreach (var (vecino, peso) in adyacencias[nodoActual])
+                    {
+                        int nuevaDistancia = distancias[nodoActual] + peso;
+                        if (nuevaDistancia < distancias[vecino])
+                        {
+                            colaPrioridad.Add((nuevaDistancia, vecino));
+                            distancias[vecino] = nuevaDistancia;
+                            anteriores[vecino] = nodoActual;
+                        }
+                    }
+                }
+
+                MostrarRuta(inicio, fin, anteriores, distancias[fin]);
+            }
+
+            private (int distancia, string nodo) ObtenerMinimo(SortedSet<(int, string)> cola)
+            {
+                var primero = default((int, string));
+                foreach (var elemento in cola)
+                {
+                    primero = elemento;
+                    break;
+                }
+                cola.Remove(primero);
+                return primero;
+            }
+
+            private void MostrarRuta(string inicio, string fin, Dictionary<string, string> anteriores, int distanciaTotal)
+            {
+                var ruta = new Stack<string>();
+                var actual = fin;
+
+                while (actual != null)
+                {
+                    ruta.Push(actual);
+                    actual = anteriores[actual];
+                }
+
+                Console.WriteLine("Ruta más corta desde " + inicio + " hasta " + fin + ":");
+                while (ruta.Count > 0)
+                {
+                    Console.Write(ruta.Pop());
+                    if (ruta.Count > 0)
+                        Console.Write(" -> ");
+                }
+                Console.WriteLine("\n Distancia total: " + distanciaTotal + " km");
+            }
+        }
+
+        class Programa
+        {
+            static void Main()
+            {
+                var grafo = new Grafo();
+                grafo.Arista("A", "B", 5);
+                grafo.Arista("A", "C", 2);
+                grafo.Arista("B", "C", 1);
+                grafo.Arista("B", "D", 3);
+                grafo.Arista("C", "D", 4);
+                grafo.Arista("D", "E", 2);
+
+                grafo.Dijkstra("A", "E");
+            }
+        }
+    }
+}
